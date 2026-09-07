@@ -11,11 +11,21 @@ import db
 # Load environment configuration
 load_dotenv()
 
-app = Flask(__name__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, "templates"),
+    static_folder=os.path.join(BASE_DIR, "static")
+)
 app.secret_key = os.getenv("SECRET_KEY", "college_assistant_secret_key_2026_super_secure")
 
-# Initialize MySQL database & tables on startup
-db_ready, db_status = db.init_db()
+# Initialize MySQL database & tables safely (won't crash serverless cold start if env vars are pending)
+try:
+    db_ready, db_status = db.init_db()
+except Exception as _init_err:
+    db_ready, db_status = False, str(_init_err)
+    print(f"[WARN] Database initialization deferred: {_init_err}")
 
 
 # =========================================================

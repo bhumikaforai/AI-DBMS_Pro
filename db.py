@@ -37,7 +37,8 @@ def get_server_connection():
         "password": MYSQL_PASSWORD,
         "charset": "utf8mb4",
         "cursorclass": DictCursor,
-        "autocommit": True
+        "autocommit": True,
+        "connect_timeout": 7
     }
     ssl_config = _get_ssl_config()
     if ssl_config:
@@ -55,7 +56,8 @@ def get_db_connection():
         "database": MYSQL_DB,
         "charset": "utf8mb4",
         "cursorclass": DictCursor,
-        "autocommit": True
+        "autocommit": True,
+        "connect_timeout": 7
     }
     ssl_config = _get_ssl_config()
     if ssl_config:

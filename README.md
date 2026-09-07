@@ -166,14 +166,27 @@ http://127.0.0.1:5000
 
 ## 🌐 Production & Cloud Deployment
 
-The application is pre-configured for cloud deployment on platforms like **Render**, **Railway**, **Heroku**, or any Linux VPS:
+The application supports both traditional WSGI containers (**Render**, **Railway**, **Heroku**, **VPS**) and Serverless deployment (**Vercel**):
 
-1. **WSGI Server**: `gunicorn` is configured in `requirements.txt`.
-2. **Process File**: Standard `Procfile` is included:
+### Deploying on Vercel
+1. **Zero-Config Routing**: Includes `vercel.json` and `api/index.py` for seamless Flask serverless execution.
+2. **Configure Environment Variables in Vercel Dashboard**:
+   Go to your Project Settings > **Environment Variables** in Vercel and add:
+   - `MYSQL_HOST`: Your TiDB Cloud or MySQL host (e.g. `gateway01.ap-southeast-1.prod.aws.tidbcloud.com`)
+   - `MYSQL_PORT`: `4000` (or `3306`)
+   - `MYSQL_USER`: Your MySQL username
+   - `MYSQL_PASSWORD`: Your database password
+   - `MYSQL_DB`: `college_assistant`
+   - `MYSQL_USE_SSL`: `auto`
+   - `SECRET_KEY`: A secure random secret string
+
+### Deploying on Render / Railway / Heroku
+1. **WSGI Server**: `gunicorn` is included in `requirements.txt`.
+2. **Process File**: Standard `Procfile` is pre-configured:
    ```
    web: gunicorn app:app
    ```
-3. **Environment Variables**: Add your production MySQL connection credentials (`MYSQL_HOST`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DB`, `MYSQL_PORT`) and a secure `SECRET_KEY` in your hosting dashboard.
+3. **Environment Variables**: Configure your MySQL credentials and `SECRET_KEY` in your hosting dashboard.
 
 ---
 
