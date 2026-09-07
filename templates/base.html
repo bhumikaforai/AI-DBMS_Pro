@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}AI College Assistant{% endblock %}</title>
+    
+    <!-- Meta tags for SEO & UI -->
+    <meta name="description" content="AI College Assistant powered by Flask, Jinja2, and MySQL. Interactive academic tutor, viva preparation, coding, and study planning.">
+    <meta name="theme-color" content="#090714">
+
+    <!-- Favicon SVG -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%237c3aed'/><text y='.9em' x='.15em' font-size='70'>🤖</text></svg>">
+
+    <!-- Design System Core CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/design-system.css') }}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    {% block content %}{% endblock %}
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
