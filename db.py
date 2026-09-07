@@ -14,31 +14,53 @@ MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")
 MYSQL_DB = os.getenv("MYSQL_DB", "college_assistant")
 
 
+MYSQL_USE_SSL = os.getenv("MYSQL_USE_SSL", "auto").strip().lower()
+
+
+def _get_ssl_config():
+    """Determine SSL parameters for cloud databases like TiDB Cloud."""
+    if MYSQL_USE_SSL in ("true", "1", "yes", "require"):
+        return {"ssl": True}
+    if MYSQL_USE_SSL == "auto":
+        # Automatically enable SSL for TiDB Cloud or port 4000
+        if "tidbcloud.com" in MYSQL_HOST.lower() or MYSQL_PORT == 4000:
+            return {"ssl": True}
+    return None
+
+
 def get_server_connection():
     """Connect to MySQL server without specifying a database (for DB creation)."""
-    return pymysql.connect(
-        host=MYSQL_HOST,
-        port=MYSQL_PORT,
-        user=MYSQL_USER,
-        password=MYSQL_PASSWORD,
-        charset="utf8mb4",
-        cursorclass=DictCursor,
-        autocommit=True
-    )
+    conn_params = {
+        "host": MYSQL_HOST,
+        "port": MYSQL_PORT,
+        "user": MYSQL_USER,
+        "password": MYSQL_PASSWORD,
+        "charset": "utf8mb4",
+        "cursorclass": DictCursor,
+        "autocommit": True
+    }
+    ssl_config = _get_ssl_config()
+    if ssl_config:
+        conn_params["ssl"] = ssl_config
+    return pymysql.connect(**conn_params)
 
 
 def get_db_connection():
     """Connect to the specific application database."""
-    return pymysql.connect(
-        host=MYSQL_HOST,
-        port=MYSQL_PORT,
-        user=MYSQL_USER,
-        password=MYSQL_PASSWORD,
-        database=MYSQL_DB,
-        charset="utf8mb4",
-        cursorclass=DictCursor,
-        autocommit=True
-    )
+    conn_params = {
+        "host": MYSQL_HOST,
+        "port": MYSQL_PORT,
+        "user": MYSQL_USER,
+        "password": MYSQL_PASSWORD,
+        "database": MYSQL_DB,
+        "charset": "utf8mb4",
+        "cursorclass": DictCursor,
+        "autocommit": True
+    }
+    ssl_config = _get_ssl_config()
+    if ssl_config:
+        conn_params["ssl"] = ssl_config
+    return pymysql.connect(**conn_params)
 
 
 def init_db():
