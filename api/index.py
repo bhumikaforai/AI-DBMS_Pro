@@ -12,19 +12,34 @@ from app import app
 class VercelPathFixMiddleware:
     """
     Middleware to ensure incoming Vercel Serverless Function rewrites
-    (/api/index or /api/index.py) map directly to Flask routes (/, /login, etc.).
+    correctly preserve the requested URL path (/login, /signup, /, etc.)
+    and prevent infinite redirect loops.
     """
     def __init__(self, wsgi_app):
         self.wsgi_app = wsgi_app
 
     def __call__(self, environ, start_response):
-        path = environ.get("PATH_INFO", "")
-        if path.startswith("/api/index.py"):
-            environ["PATH_INFO"] = path[len("/api/index.py"):] or "/"
-        elif path.startswith("/api/index"):
-            environ["PATH_INFO"] = path[len("/api/index"):] or "/"
-        elif path in ("/api", "/api/"):
-            environ["PATH_INFO"] = "/"
+        # Extract the real requested URI from proxy headers or environment
+        request_uri = (
+            environ.get("HTTP_X_MATCHED_PATH")
+            or environ.get("HTTP_X_FORWARDED_URI")
+            or environ.get("REQUEST_URI")
+            or environ.get("PATH_INFO", "/")
+        )
+
+        # Strip query strings if present
+        if "?" in request_uri:
+            request_uri = request_uri.split("?", 1)[0]
+
+        # Strip any Vercel internal function path prefix (/api/index or /api/index.py)
+        if request_uri.startswith("/api/index.py"):
+            request_uri = request_uri[len("/api/index.py"):] or "/"
+        elif request_uri.startswith("/api/index"):
+            request_uri = request_uri[len("/api/index"):] or "/"
+        elif request_uri in ("/api", "/api/"):
+            request_uri = "/"
+
+        environ["PATH_INFO"] = request_uri
         return self.wsgi_app(environ, start_response)
 
 

@@ -1583,8 +1583,6 @@ def logout():
 # =========================================================
 
 @app.route("/")
-@app.route("/api/index")
-@app.route("/api/index.py")
 @login_required
 def home():
     user = {
